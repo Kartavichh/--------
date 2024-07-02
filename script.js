@@ -12,10 +12,10 @@ async function loadTranslations(lang) {
   
   //Применение перевода
   function applyTranslations(translations) {
-    document.querySelectorAll('[data-i18n-key]').forEach(elem => {
-      const key = elem.getAttribute('data-i18n-key');
-      elem.textContent = translations[key];
-    });
+  document.querySelectorAll('[data-i18n-key]').forEach(elem => {
+    const key = elem.getAttribute('data-i18n-key');
+    elem.textContent = translations[key];
+  });
   }
 
   // Инициализация перевода при смене языка
