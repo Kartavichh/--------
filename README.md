@@ -3,10 +3,10 @@
 ## Run
 
 ### 1. Make the script executable
-bash```
+```bash
 chmod +x run.sh
 ```
 ### 2. Run the script
-bash```
+```bash
 ./run.sh
 ```
