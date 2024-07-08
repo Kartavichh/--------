@@ -51,7 +51,7 @@ cd ../weather-frontend
 ### 9. Start the React application:
 ```bash
 npm start
-```bash
+```
 
 
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
