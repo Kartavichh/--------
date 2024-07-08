@@ -1,5 +1,12 @@
 # Weather dashboard
 
+## Download
+
+### Clone from GitHub
+```bash
+git clone https://github.com/Kartavichh/Site_weather.git
+```
+
 ## Run
 
 ### 1. Make the script executable
