@@ -5,8 +5,8 @@
 Follow these steps to set up and run:
 
 ### 1. Clone the repository:
-### `git clone https://github.com/Kartavichh/Site_weather.git`
-### `cd Site_weather`
+### ```git clone https://github.com/Kartavichh/Site_weather.git```
+### ```cd Site_weather```
 
 ### 2. Start the Oracle database using Docker Compose:
 ### `cd weather-dashboard/docker`
