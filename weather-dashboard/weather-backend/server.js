@@ -154,16 +154,16 @@ setInterval(async () => {
     connection = await oracledb.getConnection(dbConfig);
     // Генерация случайных данных для вставки
     const temperature_nn = (Math.random() * 40).toFixed(1);
-    const pressure_nn = Math.floor(1000 + Math.random() * 50);
+    const pressure_nn = Math.floor(730 + Math.random() * 50);
     const humidity_nn = Math.floor(Math.random() * 100);
     const temperature_bh = (Math.random() * 40).toFixed(1);
-    const pressure_bh = Math.floor(1000 + Math.random() * 50);
+    const pressure_bh = Math.floor(730 + Math.random() * 50);
     const humidity_bh = Math.floor(Math.random() * 100);
     const temperature_ks = (Math.random() * 40).toFixed(1);
-    const pressure_ks = Math.floor(1000 + Math.random() * 50);
+    const pressure_ks = Math.floor(730 + Math.random() * 50);
     const humidity_ks = Math.floor(Math.random() * 100);
     const temperature_az = (Math.random() * 40).toFixed(1);
-    const pressure_az = Math.floor(1000 + Math.random() * 50);
+    const pressure_az = Math.floor(730 + Math.random() * 50);
     const humidity_az = Math.floor(Math.random() * 100);
 
     await connection.execute(
