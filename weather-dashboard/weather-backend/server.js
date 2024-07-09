@@ -61,7 +61,6 @@ app.get('/api/weather', async (req, res) => {
 // POST запрос http://localhost:5000/api/weather
 app.post('/api/weather', async (req, res) => {
   const {
-    id,
     temperature_nn, pressure_nn, humidity_nn,
     temperature_bh, pressure_bh, humidity_bh,
     temperature_ks, pressure_ks, humidity_ks,
@@ -71,49 +70,31 @@ app.post('/api/weather', async (req, res) => {
   let connection;
   try {
     connection = await oracledb.getConnection(dbConfig);
-    await connection.execute(
-      `MERGE INTO weather_data t
-      USING (SELECT :id AS id FROM dual) s
-      ON (t.id = s.id)
-      WHEN MATCHED THEN
-        UPDATE SET
-          t.temperature_nn = :temperature_nn,
-          t.pressure_nn = :pressure_nn,
-          t.humidity_nn = :humidity_nn,
-          t.temperature_bh = :temperature_bh,
-          t.pressure_bh = :pressure_bh,
-          t.humidity_bh = :humidity_bh,
-          t.temperature_ks = :temperature_ks,
-          t.pressure_ks = :pressure_ks,
-          t.humidity_ks = :humidity_ks,
-          t.temperature_az = :temperature_az,
-          t.pressure_az = :pressure_az,
-          t.humidity_az = :humidity_az
-      WHEN NOT MATCHED THEN
-        INSERT (
-          temperature_nn, pressure_nn, humidity_nn,
-          temperature_bh, pressure_bh, humidity_bh,
-          temperature_ks, pressure_ks, humidity_ks,
-          temperature_az, pressure_az, humidity_az
-        ) VALUES (
-          :temperature_nn, :pressure_nn, :humidity_nn,
-          :temperature_bh, :pressure_bh, :humidity_bh,
-          :temperature_ks, :pressure_ks, :humidity_ks,
-          :temperature_az, :pressure_az, :humidity_az
-        )`,
+    const result = await connection.execute(
+      `INSERT INTO weather_data (
+        temperature_nn, pressure_nn, humidity_nn,
+        temperature_bh, pressure_bh, humidity_bh,
+        temperature_ks, pressure_ks, humidity_ks,
+        temperature_az, pressure_az, humidity_az
+      ) VALUES (
+        :temperature_nn, :pressure_nn, :humidity_nn,
+        :temperature_bh, :pressure_bh, :humidity_bh,
+        :temperature_ks, :pressure_ks, :humidity_ks,
+        :temperature_az, :pressure_az, :humidity_az
+      ) RETURNING id INTO :id`,
       {
-        id: id,
         temperature_nn: temperature_nn, pressure_nn: pressure_nn, humidity_nn: humidity_nn,
         temperature_bh: temperature_bh, pressure_bh: pressure_bh, humidity_bh: humidity_bh,
         temperature_ks: temperature_ks, pressure_ks: pressure_ks, humidity_ks: humidity_ks,
-        temperature_az: temperature_az, pressure_az: pressure_az, humidity_az: humidity_az
+        temperature_az: temperature_az, pressure_az: pressure_az, humidity_az: humidity_az,
+        id: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }
       },
       { autoCommit: true }
     );
-    res.status(200).send('Data inserted or updated');
+    res.status(201).send(`Data inserted with id: ${result.outBinds.id[0]}`);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error inserting or updating data');
+    res.status(500).send('Error inserting data');
   } finally {
     if (connection) {
       try {
@@ -124,6 +105,64 @@ app.post('/api/weather', async (req, res) => {
     }
   }
 });
+
+// PUT-запрос обновляет существующую запись по заданному id
+app.put('/api/weather/', async (req, res) => {
+  const {
+    temperature_nn, pressure_nn, humidity_nn,
+    temperature_bh, pressure_bh, humidity_bh,
+    temperature_ks, pressure_ks, humidity_ks,
+    temperature_az, pressure_az, humidity_az
+  } = req.body;
+  let { id } = req.query;
+  id = parseInt(id); // По умолчанию 10 записей
+
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `UPDATE weather_data SET
+        temperature_nn = :temperature_nn,
+        pressure_nn = :pressure_nn,
+        humidity_nn = :humidity_nn,
+        temperature_bh = :temperature_bh,
+        pressure_bh = :pressure_bh,
+        humidity_bh = :humidity_bh,
+        temperature_ks = :temperature_ks,
+        pressure_ks = :pressure_ks,
+        humidity_ks = :humidity_ks,
+        temperature_az = :temperature_az,
+        pressure_az = :pressure_az,
+        humidity_az = :humidity_az
+      WHERE id = :id`,
+      {
+        id: id,
+        temperature_nn: temperature_nn, pressure_nn: pressure_nn, humidity_nn: humidity_nn,
+        temperature_bh: temperature_bh, pressure_bh: pressure_bh, humidity_bh: humidity_bh,
+        temperature_ks: temperature_ks, pressure_ks: pressure_ks, humidity_ks: humidity_ks,
+        temperature_az: temperature_az, pressure_az: pressure_az, humidity_az: humidity_az
+      },
+      { autoCommit: true }
+    );
+    if (result.rowsAffected === 0) {
+      res.status(404).send('Data not found');
+    } else {
+      res.status(200).send('Data updated');
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error updating data');
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
 
 // Добавление нового эндпоинта для очистки таблицы
 app.delete('/api/weather', async (req, res) => {
