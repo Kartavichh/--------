@@ -1,76 +1,83 @@
+// src/DataTable.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useTable } from 'react-table';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
+import './DataTable.css';
 
 const DataTable = () => {
-  const [data, setData] = useState([]);
+  const [weatherData, setWeatherData] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 30000); // 30 
-    return () => clearInterval(interval);
+    axios.get('http://localhost:5000/api/weather?limit=10')
+      .then(response => {
+        setWeatherData(response.data);
+      })
+      .catch(error => {
+        setError(error);
+      });
   }, []);
 
-  const fetchData = async () => {
-    const result = await axios.get('http://localhost:5000/api/weather');
-    setData(result.data);
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(weatherData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Weather Data');
+
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+    saveAs(data, 'weather_data.xlsx');
   };
 
-  const handleExport = () => {
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "WeatherData");
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(blob, 'WeatherData.xlsx');
-  };
-
-  const columns = React.useMemo(
-    () => [
-      { Header: 'City', accessor: 'city' },
-      { Header: 'Temperature', accessor: 'temperature' },
-      { Header: 'Pressure', accessor: 'pressure' },
-      { Header: 'Humidity', accessor: 'humidity' }
-    ],
-    []
-  );
-
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow
-  } = useTable({ columns, data });
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div>
-      <table {...getTableProps()}>
+      <h1>Weather Data</h1>
+      <button onClick={exportToExcel}>Export to Excel</button>
+      <table className="data-table">
         <thead>
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-              ))}
+          <tr>
+            <th>ID</th>
+            <th>Timestamp</th>
+            <th>Temperature (NN)</th>
+            <th>Pressure (NN)</th>
+            <th>Humidity (NN)</th>
+            <th>Temperature (BH)</th>
+            <th>Pressure (BH)</th>
+            <th>Humidity (BH)</th>
+            <th>Temperature (KS)</th>
+            <th>Pressure (KS)</th>
+            <th>Humidity (KS)</th>
+            <th>Temperature (AZ)</th>
+            <th>Pressure (AZ)</th>
+            <th>Humidity (AZ)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {weatherData.map(data => (
+            <tr key={data.id}>
+              <td>{data.id}</td>
+              <td>{data.timestamp}</td>
+              <td>{data.temperature_nn}</td>
+              <td>{data.pressure_nn}</td>
+              <td>{data.humidity_nn}</td>
+              <td>{data.temperature_bh}</td>
+              <td>{data.pressure_bh}</td>
+              <td>{data.humidity_bh}</td>
+              <td>{data.temperature_ks}</td>
+              <td>{data.pressure_ks}</td>
+              <td>{data.humidity_ks}</td>
+              <td>{data.temperature_az}</td>
+              <td>{data.pressure_az}</td>
+              <td>{data.humidity_az}</td>
             </tr>
           ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map(row => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => (
-                  <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                ))}
-              </tr>
-            );
-          })}
         </tbody>
       </table>
-      <button onClick={handleExport}>Export to Excel</button>
     </div>
   );
 };
