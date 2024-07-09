@@ -107,7 +107,7 @@ app.post('/api/weather', async (req, res) => {
 });
 
 // PUT-запрос обновляет существующую запись по заданному id
-app.put('/api/weather/', async (req, res) => {
+app.put('/api/weather', async (req, res) => {
   const {
     temperature_nn, pressure_nn, humidity_nn,
     temperature_bh, pressure_bh, humidity_bh,
@@ -115,7 +115,7 @@ app.put('/api/weather/', async (req, res) => {
     temperature_az, pressure_az, humidity_az
   } = req.body;
   let { id } = req.query;
-  id = parseInt(id); // По умолчанию 10 записей
+  id = parseInt(id);
 
   let connection;
   try {
@@ -184,6 +184,34 @@ app.delete('/api/weather', async (req, res) => {
     }
   }
 });
+
+// HEAD запрос http://localhost:5000/api/weather
+app.head('/api/weather', async (req, res) => {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT COUNT(*) AS count FROM weather_data`
+    );
+    const rowCount = result.rows[0][0];
+    res.set('X-Total-Count', rowCount.toString());
+    res.status(200).end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error fetching data');
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
+// OPTIONS запрос http://localhost:5000/api/weather
+app.options('/api/weather', cors());
 
 
 // Обновление данных (добавление новой записи каждые 30 секунд)
