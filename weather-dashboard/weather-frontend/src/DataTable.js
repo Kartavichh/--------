@@ -10,7 +10,7 @@ const DataTable = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/weather?limit=10')
+    axios.get('http://localhost:5000/api/weather')
       .then(response => {
         setWeatherData(response.data);
       })
