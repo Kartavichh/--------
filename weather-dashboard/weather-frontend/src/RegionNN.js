@@ -14,7 +14,7 @@ const RegionNN = ({ data, onEdit }) => {
             <th>Humidity</th>
             <th>Actions</th>
           </tr>
-        </thead>
+        </thead>  
         <tbody>
           {data.map((item) => (
             <tr key={item.id}>
