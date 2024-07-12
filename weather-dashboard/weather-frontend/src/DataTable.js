@@ -12,6 +12,7 @@ const DataTable = () => {
   const [weatherData, setWeatherData] = useState([]);
   const [error, setError] = useState(null);
   const [editingData, setEditingData] = useState(null);
+  const [region, setRegion] = useState('');
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/weather')
@@ -34,8 +35,9 @@ const DataTable = () => {
     saveAs(data, 'weather_data.xlsx');
   };
 
-  const handleEdit = (data) => {
+  const handleEdit = (data, region) => {
     setEditingData(data);
+    setRegion(region);
   };
 
   const handleSave = () => {
@@ -43,6 +45,7 @@ const DataTable = () => {
       .then(response => {
         setWeatherData(weatherData.map(item => item.id === editingData.id ? editingData : item));
         setEditingData(null);
+        setRegion('');
       })
       .catch(error => {
         setError(error);
@@ -65,113 +68,129 @@ const DataTable = () => {
     <div>
       <h1>Weather Data</h1>
       <button onClick={exportToExcel}>Export to Excel</button>
-      <RegionNN data={weatherData} onEdit={handleEdit} />
-      <RegionBH data={weatherData} onEdit={handleEdit} />
-      <RegionKS data={weatherData} onEdit={handleEdit} />
-      <RegionAZ data={weatherData} onEdit={handleEdit} />
+      <RegionNN data={weatherData} onEdit={(data) => handleEdit(data, 'NN')} />
+      <RegionBH data={weatherData} onEdit={(data) => handleEdit(data, 'BH')} />
+      <RegionKS data={weatherData} onEdit={(data) => handleEdit(data, 'KS')} />
+      <RegionAZ data={weatherData} onEdit={(data) => handleEdit(data, 'AZ')} />
       {editingData && (
         <div className="modal">
           <h2>Edit Weather Data</h2>
           <form>
-            <div>
-              <label>Temperature (NN)</label>
-              <input
-                name="temperature_nn"
-                value={editingData.temperature_nn}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Pressure (NN)</label>
-              <input
-                name="pressure_nn"
-                value={editingData.pressure_nn}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Humidity (NN)</label>
-              <input
-                name="humidity_nn"
-                value={editingData.humidity_nn}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Temperature (BH)</label>
-              <input
-                name="temperature_bh"
-                value={editingData.temperature_bh}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Pressure (BH)</label>
-              <input
-                name="pressure_bh"
-                value={editingData.pressure_bh}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Humidity (BH)</label>
-              <input
-                name="humidity_bh"
-                value={editingData.humidity_bh}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Temperature (KS)</label>
-              <input
-                name="temperature_ks"
-                value={editingData.temperature_ks}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Pressure (KS)</label>
-              <input
-                name="pressure_ks"
-                value={editingData.pressure_ks}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Humidity (KS)</label>
-              <input
-                name="humidity_ks"
-                value={editingData.humidity_ks}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Temperature (AZ)</label>
-              <input
-                name="temperature_az"
-                value={editingData.temperature_az}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Pressure (AZ)</label>
-              <input
-                name="pressure_az"
-                value={editingData.pressure_az}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Humidity (AZ)</label>
-              <input
-                name="humidity_az"
-                value={editingData.humidity_az}
-                onChange={handleChange}
-              />
-            </div>
+            {region === 'NN' && (
+              <>
+                <div>
+                  <label>Temperature</label>
+                  <input
+                    name="temperature_nn"
+                    value={editingData.temperature_nn}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Pressure</label>
+                  <input
+                    name="pressure_nn"
+                    value={editingData.pressure_nn}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Humidity</label>
+                  <input
+                    name="humidity_nn"
+                    value={editingData.humidity_nn}
+                    onChange={handleChange}
+                  />
+                </div>
+              </>
+            )}
+            {region === 'BH' && (
+              <>
+                <div>
+                  <label>Temperature</label>
+                  <input
+                    name="temperature_bh"
+                    value={editingData.temperature_bh}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Pressure</label>
+                  <input
+                    name="pressure_bh"
+                    value={editingData.pressure_bh}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Humidity</label>
+                  <input
+                    name="humidity_bh"
+                    value={editingData.humidity_bh}
+                    onChange={handleChange}
+                  />
+                </div>
+              </>
+            )}
+            {region === 'KS' && (
+              <>
+                <div>
+                  <label>Temperature</label>
+                  <input
+                    name="temperature_ks"
+                    value={editingData.temperature_ks}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Pressure</label>
+                  <input
+                    name="pressure_ks"
+                    value={editingData.pressure_ks}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Humidity</label>
+                  <input
+                    name="humidity_ks"
+                    value={editingData.humidity_ks}
+                    onChange={handleChange}
+                  />
+                </div>
+              </>
+            )}
+            {region === 'AZ' && (
+              <>
+                <div>
+                  <label>Temperature</label>
+                  <input
+                    name="temperature_az"
+                    value={editingData.temperature_az}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Pressure</label>
+                  <input
+                    name="pressure_az"
+                    value={editingData.pressure_az}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Humidity</label>
+                  <input
+                    name="humidity_az"
+                    value={editingData.humidity_az}
+                    onChange={handleChange}
+                  />
+                </div>
+              </>
+            )}
           </form>
           <button onClick={handleSave}>Save</button>
-          <button onClick={() => setEditingData(null)}>Cancel</button>
+          <button onClick={() => { setEditingData(null); setRegion(''); }}>Cancel</button>
         </div>
       )}
     </div>

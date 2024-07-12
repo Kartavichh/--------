@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 
 const RegionNN = ({ data, onEdit }) => {
+  const [allData, setAllData] = useState([]);
+  const [showAll, setShowAll] = useState(false);
+
+  const fetchAllData = () => {
+    axios.get('http://localhost:5000/api/weather/nn/all')
+      .then(response => {
+        setAllData(response.data);
+        setShowAll(true);
+      })
+      .catch(error => {
+        console.error('Error fetching all data: ', error);
+      });
+  };
+
   return (
     <div>
       <h2>Region NN</h2>
+      <button onClick={fetchAllData}>Show All</button>
       <table className="data-table">
         <thead>
           <tr>
@@ -14,9 +30,9 @@ const RegionNN = ({ data, onEdit }) => {
             <th>Humidity</th>
             <th>Actions</th>
           </tr>
-        </thead>  
+        </thead>
         <tbody>
-          {data.map((item) => (
+          {(showAll ? allData : data.slice(0, 10)).map((item) => (
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.timestamp}</td>
