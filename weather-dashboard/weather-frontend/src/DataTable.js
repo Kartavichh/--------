@@ -24,15 +24,22 @@ const DataTable = () => {
       });
   }, []);
 
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(weatherData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Weather Data');
+  const exportToExcel = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/weather/nn/all');
+      const data = response.data;
 
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Region NN Data');
 
-    saveAs(data, 'weather_data.xlsx');
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blobData = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+      saveAs(blobData, 'Regions_Data.xlsx');
+    } catch (error) {
+      console.error('Error exporting data: ', error);
+    }
   };
 
   const handleEdit = (data, region) => {
@@ -67,7 +74,7 @@ const DataTable = () => {
   return (
     <div>
       <h1>Weather Data</h1>
-      <button onClick={exportToExcel}>Export to Excel</button>
+      <button className="export-button" onClick={exportToExcel}>Export to Excel</button>
       <RegionNN data={weatherData} onEdit={(data) => handleEdit(data, 'NN')} />
       <RegionBH data={weatherData} onEdit={(data) => handleEdit(data, 'BH')} />
       <RegionKS data={weatherData} onEdit={(data) => handleEdit(data, 'KS')} />
