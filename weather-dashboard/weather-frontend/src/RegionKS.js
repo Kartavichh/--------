@@ -56,9 +56,9 @@ const RegionKS = ({ data, onEdit }) => {
         </tbody>
       </table>
       {!showAll ? (
-        <button onClick={handleShowAll}>Show All</button>
+        <button className="export-button" onClick={handleShowAll}>Show All</button>
       ) : (
-        <button onClick={handleHideAll}>Hide</button>
+        <button className="export-button" onClick={handleHideAll}>Hide</button>
       )}
     </div>
   );
