@@ -1,11 +1,37 @@
-// RegionNN.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './Region.css'; // Подключение CSS файла
 
 const RegionKS = ({ data, onEdit }) => {
+  const [regionData, setRegionData] = useState([]);
+  const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    if (showAll) {
+      axios.get('http://localhost:5000/api/weather/ks/all')
+        .then(response => {
+          setRegionData(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching data: ', error);
+        });
+    } else {
+      setRegionData(data);
+    }
+  }, [showAll, data]);
+
+  const handleShowAll = () => {
+    setShowAll(true);
+  };
+
+  const handleHideAll = () => {
+    setShowAll(false);
+  };
+
   return (
-    <div>
+    <div className="region-container">
       <h2>Region KS</h2>
-      <table className="data-table">
+      <table className="region-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -17,20 +43,23 @@ const RegionKS = ({ data, onEdit }) => {
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (
+          {regionData.map(item => (
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.timestamp}</td>
               <td>{item.temperature_ks}</td>
               <td>{item.pressure_ks}</td>
               <td>{item.humidity_ks}</td>
-              <td>
-                <button onClick={() => onEdit(item)}>Edit</button>
-              </td>
+              <td><button onClick={() => onEdit(item)}>Edit</button></td>
             </tr>
           ))}
         </tbody>
       </table>
+      {!showAll ? (
+        <button onClick={handleShowAll}>Show All</button>
+      ) : (
+        <button onClick={handleHideAll}>Hide</button>
+      )}
     </div>
   );
 };

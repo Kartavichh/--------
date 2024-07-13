@@ -1,26 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './Region.css'; // Подключение CSS файла
 
 const RegionNN = ({ data, onEdit }) => {
-  const [allData, setAllData] = useState([]);
+  const [regionData, setRegionData] = useState([]);
   const [showAll, setShowAll] = useState(false);
 
-  const fetchAllData = () => {
-    axios.get('http://localhost:5000/api/weather/nn/all')
-      .then(response => {
-        setAllData(response.data);
-        setShowAll(true);
-      })
-      .catch(error => {
-        console.error('Error fetching all data: ', error);
-      });
+  useEffect(() => {
+    if (showAll) {
+      axios.get('http://localhost:5000/api/weather/nn/all')
+        .then(response => {
+          setRegionData(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching data: ', error);
+        });
+    } else {
+      setRegionData(data);
+    }
+  }, [showAll, data]);
+
+  const handleShowAll = () => {
+    setShowAll(true);
+  };
+
+  const handleHideAll = () => {
+    setShowAll(false);
   };
 
   return (
-    <div>
+    <div className="region-container">
       <h2>Region NN</h2>
-      <button onClick={fetchAllData}>Show All</button>
-      <table className="data-table">
+      <table className="region-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -32,20 +43,23 @@ const RegionNN = ({ data, onEdit }) => {
           </tr>
         </thead>
         <tbody>
-          {(showAll ? allData : data.slice(0, 10)).map((item) => (
+          {regionData.map(item => (
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.timestamp}</td>
               <td>{item.temperature_nn}</td>
               <td>{item.pressure_nn}</td>
               <td>{item.humidity_nn}</td>
-              <td>
-                <button onClick={() => onEdit(item)}>Edit</button>
-              </td>
+              <td><button onClick={() => onEdit(item)}>Edit</button></td>
             </tr>
           ))}
         </tbody>
       </table>
+      {!showAll ? (
+        <button onClick={handleShowAll}>Show All</button>
+      ) : (
+        <button onClick={handleHideAll}>Hide</button>
+      )}
     </div>
   );
 };

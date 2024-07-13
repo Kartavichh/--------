@@ -1,0 +1,43 @@
+.region-container {
+    margin: 20px;
+  }
+  
+  .region-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .region-table th,
+  .region-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .region-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .region-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .region-table tr:hover {
+    background-color: #ddd;
+  }
+  
+  .region-table button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .region-table button:hover {
+    background-color: #45a049;
+  }
+  
